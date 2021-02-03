@@ -1,0 +1,6 @@
+node_modules
+dist
+.env
+user_db/*
+docker-compose.yml
+Dockerfile
