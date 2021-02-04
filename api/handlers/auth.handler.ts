@@ -1,9 +1,11 @@
-import { RequestHandler } from "express";
-import db from "./services/dbService";
-import { BadRequestException, UnauthorizedException } from "./exception";
-import authService from "./services/authService";
-import { AsyncRequestHandler } from "./types/http";
-import { HttpStatus } from "./constants";
+import { RequestHandler } from "express-serve-static-core";
+import {
+  AsyncRequestHandler,
+  BadRequestException,
+  UnauthorizedException,
+} from ".";
+import { HttpStatus } from "../constants";
+import { dbService, authService } from "../services";
 
 export const loginHandler: AsyncRequestHandler = async (req, res, next) => {
   if (req.session.uid) {
@@ -11,7 +13,10 @@ export const loginHandler: AsyncRequestHandler = async (req, res, next) => {
   }
 
   const { email, password } = req.body;
-  const user = await db.findUserFromEmail(email);
+  if (!email || !password) {
+    throw new BadRequestException(`Invalid form`);
+  }
+  const user = await dbService.findUserFromEmail(email);
 
   if (!user) {
     throw new UnauthorizedException(`user not found`);

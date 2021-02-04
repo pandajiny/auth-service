@@ -1,28 +1,29 @@
-import express, { RequestHandler } from "express";
 import {
   getAuthHandler,
   loginHandler,
   signoutHander,
   signupHandler,
   updateUserHandler,
+  AsyncRequestHandler,
 } from "./handlers";
-import { AsyncRequestHandler } from "./types/http";
+import express, { RequestHandler } from "express";
+// import { handlerWrapper } from "./app";
 
-function asyncHandler(handler: AsyncRequestHandler): RequestHandler {
+export const handlerWrapper = (
+  handler: AsyncRequestHandler
+): RequestHandler => {
   return (req, res, next) => {
     handler(req, res, next).catch((err) => {
       next(err);
     });
   };
-}
+};
 
-const router = express.Router();
+export const authRouter = express.Router();
 
-router.post("/auth", asyncHandler(loginHandler));
-router.delete("/auth", signoutHander);
-router.get("/auth", getAuthHandler);
+authRouter.post("/auth", handlerWrapper(loginHandler));
+authRouter.delete("/auth", signoutHander);
+authRouter.get("/auth", getAuthHandler);
 
-router.post("/user", signupHandler);
-router.put("/user", updateUserHandler);
-
-export const apiRouter = router;
+authRouter.post("/user", signupHandler);
+authRouter.put("/user", updateUserHandler);

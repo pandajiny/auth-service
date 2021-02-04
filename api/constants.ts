@@ -23,6 +23,13 @@ export const REDIS_PORT = getNumber("REDIS_PORT");
 export const HASH_SALT = getString("HASH_SALT");
 
 function getString(key: string): string {
+  if (
+    process.env.NODE_ENV?.includes("dev") &&
+    (key.includes("HOST") || key.includes("PORT"))
+  ) {
+    key += "_LOCAL";
+  }
+
   const value = process.env[key];
   if (!value) {
     throw `Cannot parse ${key}`;

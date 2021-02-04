@@ -1,5 +1,5 @@
 import mysql, { ConnectionOptions } from "mysql2/promise";
-import { DB_HOST, DB_PASSWORD, DB_PORT } from "../constants";
+import { DB_HOST, DB_PORT, DB_PASSWORD } from "../constants";
 
 const USER_DB = `user_db`;
 const USERS = `users`;
@@ -41,6 +41,6 @@ async function findUserFromEmail(email: string): Promise<User | null> {
   }
 }
 
-export default {
+export const dbService = {
   findUserFromEmail,
 };

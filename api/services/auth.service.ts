@@ -1,6 +1,6 @@
 import { createHmac } from "crypto";
 import { HASH_SALT } from "../constants";
-import { UnauthorizedException } from "../exception";
+import { UnauthorizedException } from "../handlers/exception.handler";
 
 async function validatePassword(password: string, _password?: string) {
   // LEGACY
@@ -11,6 +11,6 @@ async function validatePassword(password: string, _password?: string) {
   }
 }
 
-export default {
+export const authService = {
   validatePassword,
 };
