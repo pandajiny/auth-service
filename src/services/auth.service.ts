@@ -11,6 +11,11 @@ async function validatePassword(password: string, _password?: string) {
   }
 }
 
+const userDTO = (user: User): UserDTO => {
+  return { email: user.email, name: user.name, uid: user.uid };
+};
+
 export const authService = {
   validatePassword,
+  userDTO,
 };

@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "prebuild": "tsc",
-    "build": "docker build -t pandajiny/auth-backend .",
-    "docker-deploy": "docker tag pandajiny/auth-backend asia.gcr.io/auth-service-303714/auth-service-backend && docker push asia.gcr.io/auth-service-303714/auth-service-backend",
+    "build": "docker build -t auth-service .",
+    "deploy:docker": "docker tag auth-service asia.gcr.io/auth-service-303714/auth-service && docker push asia.gcr.io/auth-service-303714/auth-service",
     "predeploy": "npm run build",
-    "deploy": "npm run docker-deploy",
+    "deploy": "npm run deploy:docker",
     "start": "docker-compose up -d",
     "dev": "set NODE_ENV=dev && tsc-watch --onSuccess \"node --trace-warnings ./dist/index.js\""
   },

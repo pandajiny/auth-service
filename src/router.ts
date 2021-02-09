@@ -5,9 +5,9 @@ import {
   signupHandler,
   updateUserHandler,
   AsyncRequestHandler,
+  getUserHandler,
 } from "./handlers";
 import express, { RequestHandler } from "express";
-// import { handlerWrapper } from "./app";
 
 export const handlerWrapper = (
   handler: AsyncRequestHandler
@@ -22,8 +22,9 @@ export const handlerWrapper = (
 export const authRouter = express.Router();
 
 authRouter.post("/auth", handlerWrapper(loginHandler));
-authRouter.delete("/auth", signoutHander);
-authRouter.get("/auth", getAuthHandler);
+authRouter.delete("/auth", handlerWrapper(signoutHander));
+authRouter.get("/auth", handlerWrapper(getAuthHandler));
 
+authRouter.get("/user", handlerWrapper(getUserHandler));
 authRouter.post("/user", signupHandler);
 authRouter.put("/user", updateUserHandler);
