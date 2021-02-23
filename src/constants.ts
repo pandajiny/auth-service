@@ -46,8 +46,8 @@ const redisClient = redis.createClient(redisClientOptions);
 const SESSION_SECRET = getString("SESSION_SECRET");
 export const sessionOptions: session.SessionOptions = {
   secret: SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   cookie: {
     maxAge: 24 * 60 * 60 * 1000,
     domain: process.env.NODE_ENV?.includes("dev")
