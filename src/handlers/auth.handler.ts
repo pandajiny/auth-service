@@ -6,14 +6,19 @@ import {
 } from ".";
 import { HttpStatus } from "../constants";
 import { dbService, authService } from "../services";
+import { v4 as uniqueString } from "uuid";
 
-export const loginHandler: AsyncRequestHandler = async (req, res) => {
+function isFormInvalid(email: string, password: string) {
+  return !email || !password;
+}
+
+export const handlerLogin: AsyncRequestHandler = async (req, res) => {
   if (req.session.uid) {
     throw new BadRequestException(`Already logged in`);
   }
 
   const { email, password } = req.body;
-  if (!email || !password) {
+  if (isFormInvalid(email, password)) {
     throw new BadRequestException(`Invalid form`);
   }
   const user = await dbService.findUserFromEmail(email);
@@ -24,13 +29,10 @@ export const loginHandler: AsyncRequestHandler = async (req, res) => {
   await authService.validatePassword(password, user._password);
 
   req.session.uid = user.uid;
-  console.log(`user logged in`, user);
-  res.status(HttpStatus.OK).json({
-    session_id: req.session.id,
-  });
+  res.sendStatus(HttpStatus.OK);
 };
 
-export const signoutHander: AsyncRequestHandler = async (req, res) => {
+export const handlerSignout: AsyncRequestHandler = async (req, res) => {
   if (!req.session.uid) {
     throw new BadRequestException(`User not logged in`);
   }
@@ -40,7 +42,8 @@ export const signoutHander: AsyncRequestHandler = async (req, res) => {
     message: `Successfully logged out`,
   });
 };
-export const getAuthHandler: AsyncRequestHandler = async (req, res) => {
+
+export const handlerGetAuth: AsyncRequestHandler = async (req, res) => {
   const uid = req.session.uid as string;
   if (!uid) {
     throw new UnauthorizedException(`User not logged in`);
@@ -55,7 +58,7 @@ export const getAuthHandler: AsyncRequestHandler = async (req, res) => {
   res.status(HttpStatus.OK).json(authService.userDTO(user));
 };
 
-export const getUserHandler: AsyncRequestHandler = async (req, res) => {
+export const handlerGetUser: AsyncRequestHandler = async (req, res) => {
   const uid = req.query.uid as string;
   if (!uid) {
     throw new BadRequestException(`Cannot parse uid`);
@@ -73,5 +76,32 @@ export const getUserHandler: AsyncRequestHandler = async (req, res) => {
 
   res.status(HttpStatus.OK).json(authService.userDTO(user));
 };
-export const signupHandler: RequestHandler = () => {};
-export const updateUserHandler: RequestHandler = () => {};
+
+interface SignUpRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export const handlerSignup: AsyncRequestHandler = async (req, res) => {
+  const request = req.body as SignUpRequest;
+  const { email, name, password } = request;
+
+  await dbService.findUserFromEmail(email).then((u) => {
+    if (u) {
+      throw new BadRequestException("User already exist");
+    }
+  });
+  const uid = uniqueString();
+  const user: User = {
+    email,
+    name,
+    uid,
+    _password: authService.hashPassword(password),
+  };
+
+  await dbService.createUser(user);
+
+  res.sendStatus(HttpStatus.OK);
+};
+export const handlerUpdateUser: AsyncRequestHandler = async () => {};

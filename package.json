@@ -10,7 +10,7 @@
     "predeploy": "npm run build",
     "deploy": "npm run deploy:docker",
     "start": "docker-compose up -d",
-    "dev": "set NODE_ENV=dev && tsc-watch --onSuccess \"node --trace-warnings ./dist/index.js\""
+    "dev": "set NODE_ENV=dev && docker stop auth-service && tsc-watch --onSuccess \"node --trace-warnings ./dist/index.js\""
   },
   "keywords": [],
   "author": "",
@@ -23,7 +23,8 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mysql2": "^2.2.5",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/connect-redis": "0.0.16",
@@ -32,6 +33,7 @@
     "@types/express-session": "^1.17.3",
     "@types/module-alias": "^2.0.0",
     "@types/redis": "^2.8.28",
+    "@types/uuid": "^8.3.0",
     "module-alias": "^2.2.2"
   }
 }

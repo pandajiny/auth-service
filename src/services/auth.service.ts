@@ -11,6 +11,10 @@ async function validatePassword(password: string, _password?: string) {
   }
 }
 
+function hashPassword(password: string): string {
+  return createHmac("sha256", HASH_SALT).update(password).digest("hex");
+}
+
 const userDTO = (user: User): UserDTO => {
   return { email: user.email, name: user.name, uid: user.uid };
 };
@@ -18,4 +22,5 @@ const userDTO = (user: User): UserDTO => {
 export const authService = {
   validatePassword,
   userDTO,
+  hashPassword,
 };

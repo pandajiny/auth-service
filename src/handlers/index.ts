@@ -21,5 +21,21 @@ export const exceptionHandler: ErrorRequestHandler = (err, req, res, next) => {
   }
 };
 
+export const logMiddleWare: RequestHandler = (req, res, next) => {
+  console.log(``);
+  console.log(`${req.method} ${req.path} ${req.sessionID}`);
+  next();
+};
+
+export const handlerWrapper = (
+  handler: AsyncRequestHandler
+): RequestHandler => {
+  return (req, res, next) => {
+    handler(req, res, next).catch((err) => {
+      next(err);
+    });
+  };
+};
+
 export * from "./auth.handler";
 export * from "./exception.handler";

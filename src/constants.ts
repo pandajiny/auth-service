@@ -42,14 +42,17 @@ export const redisClientOptions: ClientOpts = {
 };
 const RedisStore = redisConnect(session);
 const redisClient = redis.createClient(redisClientOptions);
+
+const SESSION_SECRET = getString("SESSION_SECRET");
 export const sessionOptions: session.SessionOptions = {
-  secret: `secret`,
-  resave: true,
-  saveUninitialized: true,
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
   cookie: {
     maxAge: 24 * 60 * 60 * 1000,
-    sameSite: "none",
-    secure: true,
+    domain: process.env.NODE_ENV?.includes("dev")
+      ? undefined
+      : ".pandajiny.com",
   },
   store: new RedisStore({
     port: REDIS_PORT,
@@ -61,7 +64,7 @@ export const sessionOptions: session.SessionOptions = {
 // CORS
 export const corsOptions: CorsOptions = {
   credentials: true,
-  origin: ["https://scheduler.pandajiny.com", "http://localhost:1234"],
+  origin: FRONTEND_URL,
 };
 
 // CERT PATHS

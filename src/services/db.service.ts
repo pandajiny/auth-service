@@ -1,8 +1,8 @@
-import mysql, { ConnectionOptions } from "mysql2/promise";
+import mysql from "mysql2/promise";
 import { dbOptions } from "../constants";
+import { BadRequestException } from "../handlers";
 
-const USER_DB = `user_db`;
-const USERS = `users`;
+const USERS_TABLE = `users`;
 
 async function execute<T>(query: string): Promise<T[]> {
   const conn = await mysql.createConnection(dbOptions);
@@ -18,7 +18,7 @@ async function execute<T>(query: string): Promise<T[]> {
 async function findUserFromEmail(email: string): Promise<User | null> {
   const query = `
         SELECT *
-        FROM ${USER_DB}.${USERS}
+        FROM ${USERS_TABLE}
         WHERE email = "${email}"
     `;
   const users = await execute<User>(query);
@@ -37,7 +37,7 @@ async function findUserFromEmail(email: string): Promise<User | null> {
 async function findUserFromUid(uid: string): Promise<User | null> {
   const query = `
         SELECT *
-        FROM ${USER_DB}.${USERS}
+        FROM ${USERS_TABLE}
         WHERE uid = "${uid}"
     `;
   const users = await execute<User>(query);
@@ -53,7 +53,21 @@ async function findUserFromUid(uid: string): Promise<User | null> {
   }
 }
 
+async function createUser(user: User) {
+  const { _password, email, name, uid } = user;
+
+  const query = `
+    INSERT INTO ${USERS_TABLE} (uid, name, email, _password)
+    VALUES ("${uid}", "${name}", "${email}", "${_password}")
+  `;
+  await execute(query).catch((err) => {
+    console.error(err);
+    throw new BadRequestException("Cannot create user");
+  });
+}
+
 export const dbService = {
   findUserFromEmail,
   findUserFromUid,
+  createUser,
 };

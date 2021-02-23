@@ -3,8 +3,6 @@ interface User {
   name: string;
   email: string;
   _password: string;
-
-  create_at: number;
 }
 
 interface UserDTO {

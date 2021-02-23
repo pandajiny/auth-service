@@ -8,7 +8,7 @@ import {
   sessionOptions,
 } from "./constants";
 import cors from "cors";
-import { exceptionHandler } from "./handlers";
+import { exceptionHandler, logMiddleWare } from "./handlers";
 import { authRouter } from "./router";
 import session from "express-session";
 import fs from "fs";
@@ -22,15 +22,11 @@ async function bootstrap() {
   app.use(session(sessionOptions));
   app.use(JsonParser());
 
+  app.use(logMiddleWare);
   app.use(authRouter);
   app.use(exceptionHandler);
 
-  if (
-    isCertExist({
-      keyPath: KEY_PATH,
-      certPath: CERT_PATH,
-    })
-  ) {
+  if (isCertExist()) {
     const credentials: https.ServerOptions = {
       cert: fs.readFileSync(CERT_PATH),
       key: fs.readFileSync(KEY_PATH),
@@ -43,7 +39,11 @@ async function bootstrap() {
   }
 }
 
-const isCertExist = (paths: { keyPath: string; certPath: string }): boolean => {
+const isCertExist = (): boolean => {
+  const paths = {
+    keyPath: KEY_PATH,
+    certPath: CERT_PATH,
+  };
   return fs.existsSync(paths.keyPath) && fs.existsSync(paths.certPath);
 };
 
