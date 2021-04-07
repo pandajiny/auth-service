@@ -7,9 +7,12 @@ import redis, { ClientOpts } from "redis";
 
 config();
 
-export const HttpStatus = {
+const isDev = process.env.NODE_ENV?.includes("dev");
+
+export const HTTP_STATUS = {
   // OK
   OK: 200,
+  NO_CONTENt: 204,
   // ERROR
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
@@ -19,7 +22,9 @@ export const HASH_SALT = getString("HASH_SALT");
 
 export const API_PORT = getNumber("API_PORT");
 
-export const FRONTEND_URL = getString("FRONTEND_URL");
+export const FRONTEND_URLS = isDev
+  ? "http://localhost:1234"
+  : ["https://scheduler.pandajiny.com", "https://food.pandajiny.com"];
 
 // USER DB
 const DB_HOST = getString("DB_HOST");
@@ -64,7 +69,7 @@ export const sessionOptions: session.SessionOptions = {
 // CORS
 export const corsOptions: CorsOptions = {
   credentials: true,
-  origin: FRONTEND_URL,
+  origin: FRONTEND_URLS,
 };
 
 // CERT PATHS
@@ -83,7 +88,6 @@ function getString(key: string): string {
   if (!value) {
     throw `Cannot parse ${key}`;
   }
-  console.log(`${key} is ${value}`);
   return value;
 }
 
@@ -93,6 +97,5 @@ function getNumber(key: string): number {
     throw `Cannot parse API_PORT`;
   }
 
-  console.log(`${key} is ${value}`);
   return parseInt(value);
 }

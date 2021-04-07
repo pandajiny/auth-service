@@ -1,6 +1,6 @@
 import { createHmac } from "crypto";
-import { HASH_SALT } from "../constants";
-import { UnauthorizedException } from "../handlers/exception.handler";
+import { HASH_SALT } from "../../constants";
+import { UnauthorizedException } from "../http";
 
 async function validatePassword(password: string, _password?: string) {
   // LEGACY

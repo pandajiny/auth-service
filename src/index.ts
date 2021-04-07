@@ -1,31 +1,10 @@
-import express from "express";
-import { json as JsonParser } from "body-parser";
-import {
-  API_PORT,
-  CERT_PATH,
-  corsOptions,
-  KEY_PATH,
-  sessionOptions,
-} from "./constants";
-import cors from "cors";
-import { exceptionHandler, logMiddleWare } from "./handlers";
-import { authRouter } from "./router";
-import session from "express-session";
+import { API_PORT, CERT_PATH, KEY_PATH } from "./constants";
 import fs from "fs";
 import http from "http";
 import https from "https";
+import { app } from "./app";
 
 async function bootstrap() {
-  const app = express();
-
-  app.use(cors(corsOptions));
-  app.use(session(sessionOptions));
-  app.use(JsonParser());
-
-  app.use(logMiddleWare);
-  app.use(authRouter);
-  app.use(exceptionHandler);
-
   if (isCertExist()) {
     const credentials: https.ServerOptions = {
       cert: fs.readFileSync(CERT_PATH),

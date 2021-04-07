@@ -1,20 +1,16 @@
-import { RequestHandler } from "express-serve-static-core";
-import {
-  AsyncRequestHandler,
-  BadRequestException,
-  UnauthorizedException,
-} from ".";
-import { HttpStatus } from "../constants";
-import { dbService, authService } from "../services";
 import { v4 as uniqueString } from "uuid";
+import { RequestHandler } from "express";
+import { dbService } from "../db/db.service";
+import { BadRequestException, UnauthorizedException } from "../http";
+import { authService } from "./auth.service";
 
 function isFormInvalid(email: string, password: string) {
   return !email || !password;
 }
 
-export const handlerLogin: AsyncRequestHandler = async (req, res) => {
+export const handlerLogin: RequestHandler = async (req, res) => {
   if (req.session.uid) {
-    throw new BadRequestException(`Already logged in`);
+    return { message: "Already Logged in" };
   }
 
   const { email, password } = req.body;
@@ -29,21 +25,21 @@ export const handlerLogin: AsyncRequestHandler = async (req, res) => {
   await authService.validatePassword(password, user._password);
 
   req.session.uid = user.uid;
-  res.sendStatus(HttpStatus.OK);
+  return;
 };
 
-export const handlerSignout: AsyncRequestHandler = async (req, res) => {
+export const handlerSignout: RequestHandler = async (req, res) => {
   if (!req.session.uid) {
     throw new BadRequestException(`User not logged in`);
   }
 
   req.session.uid = undefined;
-  res.status(HttpStatus.OK).json({
+  return {
     message: `Successfully logged out`,
-  });
+  };
 };
 
-export const handlerGetAuth: AsyncRequestHandler = async (req, res) => {
+export const handlerGetAuth: RequestHandler = async (req, res) => {
   const uid = req.session.uid as string;
   if (!uid) {
     throw new UnauthorizedException(`User not logged in`);
@@ -55,26 +51,21 @@ export const handlerGetAuth: AsyncRequestHandler = async (req, res) => {
     throw new BadRequestException(`Cannot get user information`);
   }
 
-  res.status(HttpStatus.OK).json(authService.userDTO(user));
+  return authService.userDTO(user);
 };
 
-export const handlerGetUser: AsyncRequestHandler = async (req, res) => {
+export const handlerGetUser: RequestHandler = async (req, res) => {
   const uid = req.query.uid as string;
   if (!uid) {
     throw new BadRequestException(`Cannot parse uid`);
   }
 
-  // if (req.session.uid != uid) {
-  //   throw new UnauthorizedException(`Access denied`);
-  // }
-
   const user = await dbService.findUserFromUid(uid);
-
   if (!user) {
     throw new BadRequestException(`Cannot find user from uid`);
   }
 
-  res.status(HttpStatus.OK).json(authService.userDTO(user));
+  return authService.userDTO(user);
 };
 
 interface SignUpRequest {
@@ -83,7 +74,7 @@ interface SignUpRequest {
   password: string;
 }
 
-export const handlerSignup: AsyncRequestHandler = async (req, res) => {
+export const handlerSignup: RequestHandler = async (req, res) => {
   const request = req.body as SignUpRequest;
   const { email, name, password } = request;
 
@@ -101,7 +92,5 @@ export const handlerSignup: AsyncRequestHandler = async (req, res) => {
   };
 
   await dbService.createUser(user);
-
-  res.sendStatus(HttpStatus.OK);
+  return;
 };
-export const handlerUpdateUser: AsyncRequestHandler = async () => {};

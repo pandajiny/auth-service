@@ -9,7 +9,6 @@
     "deploy:docker": "docker tag auth-service asia.gcr.io/auth-service-303714/auth-service && docker push asia.gcr.io/auth-service-303714/auth-service",
     "predeploy": "npm run build",
     "deploy": "npm run deploy:docker",
-    "start": "docker-compose up -d",
     "dev": "set NODE_ENV=dev && docker stop auth-service && tsc-watch --onSuccess \"node --trace-warnings ./dist/index.js\""
   },
   "keywords": [],

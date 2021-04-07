@@ -1,6 +1,6 @@
 import mysql from "mysql2/promise";
-import { dbOptions } from "../constants";
-import { BadRequestException } from "../handlers";
+import { dbOptions } from "../../constants";
+import { BadRequestException } from "../http";
 
 const USERS_TABLE = `users`;
 
